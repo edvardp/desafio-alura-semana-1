@@ -46,33 +46,48 @@
                           :categoria       "Alimentação"}]
                          )
 
+;;Listar resumo de compras
+(defn listar-resumo
+  [compra]
+  (select-keys compra [:data, :valor, :estabelecimento, :categoria]))
 
-(defn listar-compras
-  [[id, data, valor, estabelecimento, categoria]]
-  {:compra-id       id
-   :data            data
-   :valor           valor
-   :estabelecimento estabelecimento
-   :categoria       categoria}
-  (println "Compra: " id )
-  (println "Data: " data )
-  (println "Valor: " valor )
-  (println "Estabelecimento: " estabelecimento )
-  (println "Categoria: " categoria )
-  (println "\n"))
+(println "\n-----Resumo das compras-----")
+(println (map listar-resumo compras-realizadas))
 
-;(println (map listar-compras compras-realizadas))
+;;Filtrar por categoria
+(defn saude? [compra]
+  (= (:categoria compra) "Saúde"))
+(defn educacao? [compra]
+  (= (:categoria compra) "Educação"))
+(defn alimentacao? [compra]
+  (= (:categoria compra) "Alimentação"))
 
-(defn agrupar-compras [compra]
-  (group-by :categoria compra))
+(def compras-saude (filter saude? compras-realizadas))
+(def compras-educacao (filter educacao? compras-realizadas))
+(def compras-alimentacao (filter alimentacao? compras-realizadas))
 
-(defn retorna-valores [[lista]]
-  (get-in lista [:valor])
+(println "\n-----Itens comprados por categoria-----")
+(println "Saúde:" compras-saude)
+(println "Educação:" compras-educacao)
+(println "Alimentação:" compras-alimentacao)
 
-  (println retorna-valores compras-realizadas))
+;;Valores compras por categoria
+(defn traz-valor [compra]
+  (:valor compra))
 
+(def valor-saude (->> (filter saude? compras-realizadas)
+                      (map traz-valor)
+                      (reduce +)))
+(def valor-educacao (reduce + (map traz-valor (filter educacao? compras-realizadas))))
+(def valor-alimentacao (reduce + (map traz-valor (filter alimentacao? compras-realizadas))))
 
+(println "\n-----Valores totais por categoria-----")
+(println "Saúde:" valor-saude)
+(println "Educação:" valor-educacao)
+(println "Alimentação:" valor-alimentacao)
 
+(println "\n-----Valores totais-----")
+(println "Valor da Fatura:" (reduce + (map traz-valor compras-realizadas)))
 
-
+;;Buscar por valor ou categoria
 
